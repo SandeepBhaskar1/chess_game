@@ -4,6 +4,7 @@ import Piece from './Piece';
 import { createPosition, copyPosition } from '../../help';
 import { useAppContext } from '../../contexts/Context';
 import { clearCandidates, makeNewMove } from '../../reducer/actions/move';
+import arbiter from '../../arbiter/arbiter';
 
 const Pieces = () => {
     const ref = useRef();
@@ -18,22 +19,24 @@ const Pieces = () => {
         return { x, y };
     };
 
-    const onDrop = (e) => {
-        const newPosition = copyPosition(currentPosition);
+    const move = e => {
         const { x, y } = calCoord(e);
-        const [p, rank, file] = e.dataTransfer.getData('text').split(',');
+        const [piece, rank, file] = e.dataTransfer.getData('text').split(',');
 
         if (appState.candidateMoves?.some(m => m[0] === x && m[1] === y)) {
-            // En-Passant
-            if (p.endsWith('p') && !newPosition[x][y] && x !== rank && y !== file)
-                newPosition[rank][y] = '';
-
-            newPosition[rank][file] = '';
-            newPosition[x][y] = p;
+            const newPosition = arbiter.performMove({
+                position: currentPosition,
+                piece,rank,file,
+                x,y
+            })
             dispatch(makeNewMove({ newPosition }))
         }
             dispatch(clearCandidates());
+    }
 
+    const onDrop = (e) => {
+        e.preventDefault();
+        move (e);
     };
 
     const onDragOver = (e) => e.preventDefault();
