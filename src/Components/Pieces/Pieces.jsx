@@ -1,10 +1,12 @@
 import React, { useRef, useState } from 'react';
 import './Pieces.css';
 import Piece from './Piece';
-import { createPosition, copyPosition } from '../../help';
 import { useAppContext } from '../../contexts/Context';
 import { clearCandidates, makeNewMove } from '../../reducer/actions/move';
 import arbiter from '../../arbiter/arbiter';
+import { openPromotion } from '../../reducer/actions/popup';
+import { getCastleDirection, getCastlingMoves } from '../../arbiter/getMoves';
+import { updateCastling } from '../../reducer/actions/Game';
 
 const Pieces = () => {
     const ref = useRef();
@@ -19,11 +21,41 @@ const Pieces = () => {
         return { x, y };
     };
 
+    const openPromotionBox = ({rank, file, x, y}) => {
+        dispatch(openPromotion({
+            rank : Number(rank),
+            file : Number(file),
+            x, 
+            y
+        }))
+    }
+
+    const updateCastlingState = ({ piece, rank, file }) => {
+        const direction = getCastleDirection({
+            castleDirection: appState.castleDirection, 
+            piece,
+            rank,
+            file,
+        });
+    
+        if (direction) {
+            dispatch(updateCastling(direction));
+        }
+    };
+
     const move = e => {
         const { x, y } = calCoord(e);
         const [piece, rank, file] = e.dataTransfer.getData('text').split(',');
 
         if (appState.candidateMoves?.some(m => m[0] === x && m[1] === y)) {
+            if ((piece === 'wp' && x === 7) || (piece === 'bp' && x === 0)) {
+                openPromotionBox ({rank, file, x, y})
+                return
+            }
+            if (piece.endsWith('r') || piece.endsWith('k')){
+                updateCastlingState ({piece, rank, file})
+            }
+
             const newPosition = arbiter.performMove({
                 position: currentPosition,
                 piece,rank,file,

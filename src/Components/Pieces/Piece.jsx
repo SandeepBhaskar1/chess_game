@@ -5,7 +5,7 @@
     const Piece = ({rank, file, piece }) => {
 
         const {appState, dispatch} = useAppContext();
-        const {turn, position} = appState;
+        const {turn,castleDirection, position } = appState;
         const currentPosition = position[position.length - 1]
         const previousPosition = position.length > 1 ? position[position.length - 2] : null;
         
@@ -17,7 +17,14 @@
                 e.target.style.display = 'none'
             },0)
             if (turn === piece[0]) {
-                const candidateMoves = arbiter.getValidMoves({position: currentPosition, previousPosition, piece, rank, file})
+                const candidateMoves = arbiter.getValidMoves({
+                    position: currentPosition,
+                    previousPosition,
+                    piece,
+                    castleDirection : castleDirection[turn] ,
+                    rank, 
+                    file
+                })
                 dispatch (generateCandidateMoves ({candidateMoves}))   
             }
         }
