@@ -6,7 +6,7 @@ import { clearCandidates, makeNewMove } from '../../reducer/actions/move';
 import arbiter from '../../arbiter/arbiter';
 import { openPromotion } from '../../reducer/actions/popup';
 import { getCastleDirection, getCastlingMoves } from '../../arbiter/getMoves';
-import { updateCastling } from '../../reducer/actions/Game';
+import { detectStalemate, updateCastling } from '../../reducer/actions/Game';
 
 const Pieces = () => {
     const ref = useRef();
@@ -46,25 +46,35 @@ const Pieces = () => {
     const move = e => {
         const { x, y } = calCoord(e);
         const [piece, rank, file] = e.dataTransfer.getData('text').split(',');
-
+    
         if (appState.candidateMoves?.some(m => m[0] === x && m[1] === y)) {
+            const opponent = piece.startsWith('b') ? 'w' : 'b';
+            const castleDirection = appState.castleDirection[`${piece.startsWith('b') ? 'w' : 'b'}`];
+    
             if ((piece === 'wp' && x === 7) || (piece === 'bp' && x === 0)) {
-                openPromotionBox ({rank, file, x, y})
-                return
+                openPromotionBox({ rank, file, x, y });
+                return;
             }
-            if (piece.endsWith('r') || piece.endsWith('k')){
-                updateCastlingState ({piece, rank, file})
+            if (piece.endsWith('r') || piece.endsWith('k')) {
+                updateCastlingState({ piece, rank, file });
             }
-
+    
             const newPosition = arbiter.performMove({
                 position: currentPosition,
-                piece,rank,file,
-                x,y
-            })
-            dispatch(makeNewMove({ newPosition }))
+                piece,
+                rank,
+                file,
+                x,
+                y
+            });
+            dispatch(makeNewMove({ newPosition }));
+    
+            if (arbiter.isStalemate({position: newPosition, player: opponent, castleDirection}))
+                dispatch (detectStalemate())
         }
-            dispatch(clearCandidates());
-    }
+        dispatch(clearCandidates());
+    };
+    
 
     const onDrop = (e) => {
         e.preventDefault();

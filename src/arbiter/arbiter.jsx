@@ -52,14 +52,6 @@ const arbiter = {
         return notInCheckMoves;
     },
 
-    performMove: function ({ position, piece, rank, file, x, y }) {
-        if (piece.endsWith('p')) {
-            return movePawn({ position, piece, rank, file, x, y });
-        } else if (piece) {
-            return movePiece({ position, piece, rank, file, x, y });
-        }
-    },
-
     isPlayerInCheck: function ({ positionAfterMove, position, player }) {
         const enemy = player.startsWith('w') ? 'b' : 'w';
         const kingPos = getKingPosition(positionAfterMove, player);
@@ -83,7 +75,33 @@ const arbiter = {
             return true;
 
         return false;
+    },
+
+    performMove: function ({ position, piece, rank, file, x, y }) {
+        if (piece.endsWith('p')) {
+            return movePawn({ position, piece, rank, file, x, y });
+        } else if (piece) {
+            return movePiece({ position, piece, rank, file, x, y });
+        }
+    },
+
+    isStalemate: function ({ position, player, castleDirection }) {
+        const isInCheck = this.isPlayerInCheck({ positionAfterMove: position, player });
+        if (isInCheck) return false;
+    
+        const pieces = getPieces(position, player);
+        const moves = pieces.reduce((acc, p) => [
+            ...acc,
+            ...this.getValidMoves({
+                position,
+                castleDirection,
+                ...p
+            })
+        ], []);
+    
+        return moves.length === 0;
     }
+    
 }
 
 export default arbiter;
