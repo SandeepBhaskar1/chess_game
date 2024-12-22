@@ -13,6 +13,7 @@
     background-size: 100%;
     position: absolute;
     cursor: grab;
+    z-index: 5;
   }
 
   .piece:active {

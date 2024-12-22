@@ -50,3 +50,16 @@
   top: 0;
   border: 6px solid rgb(88, 88, 88);
 }
+
+.checked::after {
+  content: '';
+  display: block;
+  position: absolute;
+  width: var(--tile-size);
+  height: var(--tile-size);
+  border-radius: 20%;
+  left: 0;
+  right: 0;
+  z-index: 2;
+  background: rgb(255, 96, 96);
+}
