@@ -1,3 +1,4 @@
+import { areSameColorTiles, findPieceCoords } from "../help";
 import { getBishopMoves, getKingMoves, getKnightMoves, getQueenMoves, getRookMoves, getSoldiersCapture, getSoldiersMoves, getCastlingMoves, getKingPosition, getPieces } from "./getMoves"
 import { movePawn, movePiece } from "./move";
 
@@ -100,8 +101,41 @@ const arbiter = {
         ], []);
     
         return moves.length === 0;
+    },
+
+insufficientMaterial: function ({ position }) {
+    const pieces = position.reduce((acc, rank) => 
+        acc = [
+            ...acc,
+            ...rank.filter(x => x) 
+    ], [])
+
+    if (pieces.length === 2) return true;
+
+    if (pieces.length === 3 && (pieces.some(p => p.endsWith('b') || p.endsWith('n'))))
+        return true
+
+    if (
+        pieces.length === 4 &&
+        pieces.every(p => p.endsWith('b') || p.endsWith('k')) &&
+        new Set(pieces).size === 4
+    ) {
+        const wbCoords = findPieceCoords(position, 'wb');
+        const bbCoords = findPieceCoords(position, 'bb');
+
+        if (
+            wbCoords?.[0] && 
+            bbCoords?.[0] && 
+            areSameColorTiles(wbCoords[0], bbCoords[0])
+        ) {
+            return true
+        }
     }
-    
+
+    return false;
+}
+
+
 }
 
 export default arbiter;

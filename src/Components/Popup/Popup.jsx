@@ -6,14 +6,14 @@ import { closePopup } from '../../reducer/actions/popup';
 
 const Popup = ({children}) => {
 
-    const {appState, dispatch} = useAppContext()
-
-    if (appState.status === Status.ongoing)
-        return null;
+    const {appState: {status}, dispatch} = useAppContext()
 
     const onClosePopup = () => {
         dispatch(closePopup());
     }
+
+    if (status === Status.ongoing)
+      return null;
 
   return (
     <div className='popup'>
