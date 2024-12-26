@@ -1,0 +1,14 @@
+.timer {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+    font-size: 1.5rem;
+    font-weight: bold;
+    width: 500px;
+    color: aliceblue;
+}
+
+.timer__white,
+.timer__black {
+    padding: 0.5rem 1rem;
+}

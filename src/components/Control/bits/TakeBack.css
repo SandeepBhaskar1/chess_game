@@ -1,0 +1,8 @@
+.tb-button button {
+    color: var(--light-tile);
+    padding: 15px 40px;
+    margin: 10px;
+    font-size: 1em;
+    transform: translate(150px);
+    background: none;
+  } 
