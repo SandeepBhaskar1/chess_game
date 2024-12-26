@@ -1,2 +1,2 @@
 Netlify deployed Link [https://sandeepbhaskar-chessgame.netlify.app/],
-Github deploy link [https://SandeepBhaskar1.guthub.io/chess_game/]
+Github deploy link [https://sandeepbhaskar1.github.io/chess_game/]
